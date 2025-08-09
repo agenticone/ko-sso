@@ -1,0 +1,13 @@
+Vagrant.configure("2") do |config|
+  config.vm.box = "bento/ubuntu-22.04"
+  config.vm.provider :hyperv do |h|
+    h.memory = 4096
+    h.cpus = 2
+    h.vm_integration_services = {
+      guest_service: true
+    }
+  end
+  config.vm.hostname = "sso-lab"
+  config.vm.network "private_network", ip: "192.168.56.50"
+  config.vm.provision "shell", path: "provision.sh"
+end

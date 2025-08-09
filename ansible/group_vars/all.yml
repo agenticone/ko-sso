@@ -1,0 +1,7 @@
+kc_url: "http://192.168.56.50:8080"
+kc_admin_user: "admin"
+kc_admin_pass: "admin123"
+ldap_base_dn: "dc=example,dc=org"
+ldap_bind_dn: "cn=admin,dc=example,dc=org"
+ldap_bind_password: "ldappass"
+demo_user_password: "Password!123"
