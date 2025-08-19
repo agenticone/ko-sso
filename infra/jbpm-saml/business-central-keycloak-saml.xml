@@ -1,0 +1,16 @@
+<keycloak-saml-adapter xmlns="urn:keycloak:saml:adapter">
+  <SP entityID="urn:jbpm:business-central"
+      logoutPage="/logout.jsp"
+      sslPolicy="EXTERNAL"
+      nameIDPolicyFormat="urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified">
+    <Keys>
+      <Key signing="true" />
+    </Keys>
+    <PrincipalNameMapping policy="FROM_ATTRIBUTE" attribute="email"/>
+    <RoleIdentifiers>
+      <Attribute name="roles"/>
+    </RoleIdentifiers>
+    <IDPMetadataURL>https://keycloak.local.test/realms/jbpm/protocol/saml/descriptor</IDPMetadataURL>
+  </SP>
+</keycloak-saml-adapter>
+

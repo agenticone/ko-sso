@@ -1,0 +1,19 @@
+log:
+  level: INFO
+entryPoints:
+  web:
+    address: ":80"
+  websecure:
+    address: ":443"
+providers:
+  docker:
+    exposedByDefault: false
+# For public domains, uncomment and set an email to enable Let's Encrypt HTTP-01:
+# certificatesResolvers:
+#   letsencrypt:
+#     acme:
+#       email: you@example.com
+#       storage: /acme/acme.json
+#       httpChallenge:
+#         entryPoint: web
+

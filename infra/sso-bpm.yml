@@ -1,0 +1,88 @@
+version: "3.9"
+
+networks:
+  edge:
+
+volumes:
+  acme: {}
+  kc-db: {}
+  jbpm-db: {}
+  traefik-certs: {}
+  realm-import: {}
+  saml-config: {}
+
+services:
+  traefik:
+    image: traefik:v3.0
+    command: ["--providers.file.directory=/etc/traefik","--providers.file.watch=true"]
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./reverse-proxy/traefik.yml:/etc/traefik/traefik.yml:ro
+      - acme:/acme
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks: [edge]
+
+  kc-db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak
+      POSTGRES_DB: keycloak
+    volumes: [kc-db:/var/lib/postgresql/data]
+    networks: [edge]
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    command: ["start", "--hostname=keycloak.local.test", "--proxy=edge", "--http-enabled=true", "--import-realm"]
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://kc-db:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    volumes:
+      - realm-import:/opt/keycloak/data/import
+      - ./keycloak/realm-jbpm-saml.json:/opt/keycloak/data/import/realm-jbpm-saml.json:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.kc.rule=Host(`keycloak.local.test`)"
+      - "traefik.http.routers.kc.entrypoints=websecure"
+      # For public domain + LE: add 'traefik.http.routers.kc.tls.certresolver=letsencrypt'
+      - "traefik.http.services.kc.loadbalancer.server.port=8080"
+    depends_on: [kc-db, traefik]
+    networks: [edge]
+
+  jbpm-db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: jbpm
+      POSTGRES_PASSWORD: jbpm
+      POSTGRES_DB: jbpm
+    volumes: [jbpm-db:/var/lib/postgresql/data]
+    networks: [edge]
+
+  jbpm:
+    build:
+      context: ./jbpm-oidc
+      dockerfile: Dockerfile
+    environment:
+      JBPM_DB_DRIVER: postgres
+      JBPM_DB_URL: jdbc:postgresql://jbpm-db:5432/jbpm
+      JBPM_DB_USER: jbpm
+      JBPM_DB_PASSWORD: jbpm
+      # local admin (rarely needed once OIDC is on)
+      KIE_SERVER_USER: kieserver
+      KIE_SERVER_PWD: kieserver1!
+      BUSINESS_CENTRAL_USER: wbadmin
+      BUSINESS_CENTRAL_PWD: wbadmin
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.jbpm.rule=Host(`jbpm.local.test`)"
+      - "traefik.http.routers.jbpm.entrypoints=websecure"
+      - "traefik.http.services.jbpm.loadbalancer.server.port=8080"
+    depends_on: [jbpm-db, keycloak]
+    networks: [edge]
+

@@ -1,0 +1,118 @@
+{
+  "realm": "jbpm",
+  "enabled": true,
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "sslRequired": "external",
+
+  "identityProviders": [],
+  "users": [],
+  "groups": [],
+  "clients": [
+    {
+      "clientId": "jbpm-business-central",
+      "protocol": "saml",
+      "name": "Business Central (jBPM)",
+      "enabled": true,
+      "attributes": {
+        "saml.assertion.signature": "true",
+        "saml.authnstatement": "true",
+        "saml_force_name_id_format": "true",
+        "saml_signature_canonicalization_method": "http://www.w3.org/2001/10/xml-exc-c14n#"
+      },
+      "baseUrl": "https://jbpm.local.test/BusinessCentral",
+      "adminUrl": "https://jbpm.local.test/BusinessCentral",
+      "redirectUris": ["https://jbpm.local.test/*"],
+      "rootUrl": "https://jbpm.local.test",
+      "protocolMappers": [{
+        "name": "roles",
+        "protocol": "saml",
+        "protocolMapper": "saml-role-list-mapper",
+        "consentRequired": false,
+        "config": {
+          "single": "false",
+          "attribute.name": "roles",
+          "attribute.nameformat": "Basic"
+        }
+      }]
+    },
+    {
+      "clientId": "jbpm-kie-server",
+      "protocol": "saml",
+      "name": "KIE Server",
+      "enabled": true,
+      "attributes": {
+        "saml.assertion.signature": "true",
+        "saml.authnstatement": "true",
+        "saml_force_name_id_format": "true"
+      },
+      "baseUrl": "https://jbpm.local.test/kie-server/services/rest",
+      "redirectUris": ["https://jbpm.local.test/*"],
+      "rootUrl": "https://jbpm.local.test"
+    }
+  ],
+
+  "components": {
+    "org.keycloak.storage.UserStorageProvider": [
+      {
+        "name": "OpenLDAP",
+        "providerId": "ldap",
+        "subComponents": {
+          "org.keycloak.storage.ldap.mappers.LDAPStorageMapper": [
+            {
+              "name": "username",
+              "providerId": "user-attribute-ldap-mapper",
+              "config": {
+                "user.model.attribute": "username",
+                "ldap.attribute": "uid",
+                "is.mandatory.in.ldap": "true",
+                "read.only": "true",
+                "always.read.value.from.ldap": "true"
+              }
+            },
+            {
+              "name": "email",
+              "providerId": "user-attribute-ldap-mapper",
+              "config": {
+                "user.model.attribute": "email",
+                "ldap.attribute": "mail",
+                "read.only": "true",
+                "always.read.value.from.ldap": "true"
+              }
+            },
+            {
+              "name": "first name",
+              "providerId": "user-attribute-ldap-mapper",
+              "config": {
+                "user.model.attribute": "firstName",
+                "ldap.attribute": "givenName"
+              }
+            },
+            {
+              "name": "last name",
+              "providerId": "user-attribute-ldap-mapper",
+              "config": {
+                "user.model.attribute": "lastName",
+                "ldap.attribute": "sn"
+              }
+            }
+          ]
+        },
+        "config": {
+          "enabled": "true",
+          "priority": "0",
+          "editMode": "READ_ONLY",
+          "bindDn": "cn=admin,dc=demo,dc=local",
+          "bindCredential": "admin",
+          "vendor": "other",
+          "usernameLDAPAttribute": "uid",
+          "rdnLDAPAttribute": "uid",
+          "uuidLDAPAttribute": "entryUUID",
+          "baseDN": "dc=demo,dc=local",
+          "userObjectClasses": "inetOrgPerson, organizationalPerson"
+        }
+      }
+    ]
+  }
+}
+

@@ -1,0 +1,12 @@
+{
+  "realm": "jbpm",
+  "auth-server-url": "https://keycloak.local.test/",
+  "ssl-required": "external",
+  "resource": "jbpm-business-central",
+  "credentials": { "secret": "CHANGE-ME-AFTER-IMPORT" },
+  "confidential-port": 0,
+  "principal-attribute": "email",
+  "use-resource-role-mappings": false,
+  "bearer-only": false
+}
+

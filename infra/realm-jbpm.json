@@ -1,0 +1,24 @@
+{
+  "clientId": "jbpm-business-central",
+  "protocol": "openid-connect",
+  "name": "Business Central (OIDC)",
+  "enabled": true,
+  "publicClient": false,
+  "secret": "CHANGE-ME-AFTER-IMPORT",
+  "standardFlowEnabled": true,
+  "implicitFlowEnabled": false,
+  "directAccessGrantsEnabled": false,
+  "serviceAccountsEnabled": false,
+  "redirectUris": ["https://jbpm.local.test/*"],
+  "webOrigins": ["https://jbpm.local.test"],
+  "attributes": {
+    "post.logout.redirect.uris": "https://jbpm.local.test/*"
+  },
+  "protocolMappers": [{
+    "name": "roles",
+    "protocol": "openid-connect",
+    "protocolMapper": "oidc-usermodel-realm-role-mapper",
+    "config": { "claim.name": "roles", "jsonType.label": "String", "multivalued": "true", "id.token.claim": "true", "access.token.claim": "true" }
+  }]
+}
+
